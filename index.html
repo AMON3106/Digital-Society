@@ -1,233 +1,272 @@
 <!DOCTYPE html>
+<html>
   <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Group 81 Survey</title>
     <!-- Firebase library -->
     <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-compat.js"></script>
     <style>
       * {
-          box-sizing: border-box;
+        box-sizing: border-box;
       }
 
       body {
-          font-family: Arial, sans-serif;
-          text-align: center;
-          background-color: #f4f6fb;
-          color: #303749;
-          margin: 0;
+        font-family: Arial, sans-serif;
+        text-align: center;
+        background-color: #f4f6fb;
+        color: #303749;
+        margin: 0;
+        -webkit-text-size-adjust: 100%;
       }
 
       header {
-          background-color: #6673a8;
-          color: white;
-          padding: 28px 20px;
-          box-shadow: 0 3px 12px rgba(55, 64, 95, 0.12);
+        background-color: #6673a8;
+        color: white;
+        padding: clamp(18px, 4vw, 28px) 16px;
+        box-shadow: 0 3px 12px rgba(55, 64, 95, 0.12);
       }
 
       header h1 {
-          margin: 0 0 8px;
-          font-size: 30px;
-          font-weight: 600;
+        margin: 0;
+        font-size: clamp(22px, 5vw, 30px);
+        font-weight: 600;
       }
 
       header p {
-          margin: 0;
-          opacity: 0.94;
+        margin: 8px 0 0;
+        opacity: 0.94;
       }
 
       .survey-container {
-          background: white;
-          margin: 28px auto;
-          padding: 32px;
-          border-radius: 18px;
-          width: 92%;
-          max-width: 1100px;
-          box-shadow: 0 7px 24px rgba(55, 64, 95, 0.08);
+        background: white;
+        margin: clamp(12px, 3vw, 28px) auto;
+        padding: clamp(16px, 4vw, 32px);
+        border-radius: 18px;
+        width: min(95%, 1100px);
+        box-shadow: 0 7px 24px rgba(55, 64, 95, 0.08);
       }
 
       .survey-container h2 {
-          color: #3f4862;
-          margin-top: 0;
+        color: #3f4862;
+        margin-top: 0;
+        font-size: clamp(20px, 4vw, 24px);
       }
 
       .intro {
-          max-width: 99999999px;
-          margin: 0 auto 28px;
-          line-height: 1.6;
-          color: #667085;
+        max-width: 85ch;
+        margin: 0 auto clamp(20px, 4vw, 28px);
+        line-height: 1.6;
+        font-size: clamp(14px, 2.5vw, 16px);
+        color: #667085;
       }
 
       .plots {
-          display: grid;
-          grid-template-columns: repeat(2, minmax(280px, 1fr));
-          gap: 24px;
-          align-items: start;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr));
+        gap: clamp(16px, 3vw, 24px);
+        align-items: start;
       }
 
       .plot-card {
-          background: #fafbfe;
-          border: 1px solid #e1e5ef;
-          border-radius: 16px;
-          padding: 20px;
-          box-shadow: 0 3px 12px rgba(55, 64, 95, 0.04);
+        background: #fafbfe;
+        border: 1px solid #e1e5ef;
+        border-radius: 16px;
+        padding: clamp(12px, 3vw, 20px);
+        box-shadow: 0 3px 12px rgba(55, 64, 95, 0.04);
       }
 
       .plot-card h3 {
-          margin: 0 0 7px;
-          color: #454e69;
-          font-size: 21px;
+        margin: 0 0 7px;
+        color: #454e69;
+        font-size: clamp(18px, 3.5vw, 21px);
       }
 
       .ternary-svg {
-          width: 100%;
-          max-width: 560px;
-          height: auto;
-          display: block;
-          margin: 6px auto 0;
-          touch-action: none;
-          user-select: none;
+        width: 100%;
+        max-width: 560px;
+        height: auto;
+        display: block;
+        margin: 6px auto 0;
+        touch-action: none;
+        user-select: none;
+        -webkit-user-select: none;
+        cursor: pointer;
       }
 
       .triangle {
-          fill: #f1f3f9;
-          stroke: #858da2;
-          stroke-width: 2;
+        fill: #f1f3f9;
+        stroke: #858da2;
+        stroke-width: 2;
       }
 
       .grid-line {
-          stroke: #d9deea;
-          stroke-width: 1;
+        stroke: #d9deea;
+        stroke-width: 1;
       }
 
       .axis-label {
-          font-size: 15px;
-          font-weight: bold;
-          fill: #4f5871;
+        font-size: 16px;
+        font-weight: bold;
+        fill: #4f5871;
       }
 
       .grid-label {
-          font-size: 11px;
-          fill: #8a92a5;
+        font-size: 12px;
+        fill: #8a92a5;
       }
 
       .selection-point {
-          fill: #6673a8;
-          stroke: white;
-          stroke-width: 4;
-          cursor: grab;
-          filter: drop-shadow(0 3px 5px rgba(50, 58, 90, 0.22));
+        fill: #6673a8;
+        stroke: white;
+        stroke-width: 4;
+        cursor: grab;
+        filter: drop-shadow(0 3px 5px rgba(50, 58, 90, 0.22));
+        transition: r 0.15s ease, fill 0.15s ease;
       }
 
       .selection-point:hover {
-          fill: #7885b7;
+        fill: #7885b7;
       }
 
       .selection-point.dragging {
-          cursor: grabbing;
+        cursor: grabbing;
+        r: 15px;
+      }
+
+      .selection-hit-area {
+        fill: transparent;
+        cursor: grab;
       }
 
       .values {
-          display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          gap: 9px;
-          margin-top: 12px;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: clamp(6px, 1.5vw, 9px);
+        margin-top: 12px;
       }
 
       .value-box {
-          background: #eef1f7;
-          color: #677087;
-          border-radius: 9px;
-          padding: 10px 8px;
-          font-size: 13px;
+        background: #eef1f7;
+        color: #677087;
+        border-radius: 9px;
+        padding: clamp(8px, 2vw, 10px) 6px;
+        font-size: clamp(11px, 2.5vw, 13px);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
       }
 
       .value-box strong {
-          display: block;
-          font-size: 20px;
-          margin-top: 4px;
-          color: #41495f;
+        display: block;
+        font-size: clamp(16px, 4vw, 20px);
+        margin-top: 4px;
+        color: #41495f;
       }
 
       .instruction {
-          color: #8a92a5;
-          font-size: 14px;
-          margin: 11px 0 0;
+        color: #8a92a5;
+        font-size: 14px;
+        margin: 11px 0 0;
       }
 
       .submit-area {
-          margin-top: 28px;
+        margin-top: clamp(20px, 4vw, 28px);
       }
 
       button,
       .nav-button {
-          background-color: #6673a8;
-          border: none;
-          color: white;
-          padding: 12px 25px;
-          text-align: center;
-          text-decoration: none;
-          display: inline-block;
-          font-size: 16px;
-          cursor: pointer;
-          border-radius: 9px;
-          margin: 5px;
-          transition: background-color 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
-          box-shadow: 0 4px 10px rgba(70, 80, 120, 0.12);
+        background-color: #6673a8;
+        border: none;
+        color: white;
+        padding: 14px 28px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        border-radius: 9px;
+        margin: 5px;
+        transition: background-color 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+        box-shadow: 0 4px 10px rgba(70, 80, 120, 0.12);
       }
 
       button:hover,
       .nav-button:hover {
-          background-color: #59679c;
-          transform: translateY(-1px);
+        background-color: #59679c;
+        transform: translateY(-1px);
       }
 
       button:active,
       .nav-button:active {
-          transform: translateY(0);
+        transform: translateY(0);
       }
 
       button:disabled {
-          background-color: #aeb5c7;
-          cursor: not-allowed;
-          transform: none;
-          box-shadow: none;
+        background-color: #aeb5c7;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
       }
 
       .status {
-          min-height: 26px;
-          margin: 14px auto 0;
-          max-width: 700px;
-          font-weight: normal;
-          line-height: 1.5;
+        min-height: 26px;
+        margin: 14px auto 0;
+        max-width: 700px;
+        font-weight: normal;
+        line-height: 1.5;
+        font-size: 15px;
       }
 
       .status.saving {
-          color: #7b8396;
+        color: #7b8396;
       }
 
       .status.success {
-          color: #59679c;
+        color: #59679c;
       }
 
       .status.error {
-          color: #a25c66;
+        color: #a25c66;
       }
 
-      @media (max-width: 760px) {
-          .survey-container {
-              padding: 22px;
-          }
+      /* Tablet & Mobile adjustments */
+      @media (max-width: 600px) {
+        .survey-container {
+          width: 96%;
+          border-radius: 14px;
+        }
 
-          .plots {
-              grid-template-columns: 1fr;
-          }
+        .intro {
+          text-align: left;
+        }
 
-          .values {
-              grid-template-columns: 1fr;
-          }
+        .axis-label {
+          font-size: 17px;
+        }
 
-          header h1 {
-              font-size: 26px;
-          }
+        .grid-label {
+          font-size: 13px;
+        }
+
+        button,
+        .nav-button {
+          width: 100%;
+          max-width: 340px;
+          margin: 5px 0;
+        }
+      }
+
+      @media (max-width: 350px) {
+        .values {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (pointer: coarse) {
+        .selection-point {
+          r: 14px;
+        }
       }
     </style>
   </head>
@@ -239,32 +278,32 @@
     <div class="survey-container">
       <h2>Scenario</h2>
       <p class="intro">
-         In 2060, EU law requires banks to have an AI agent that restricts people's carbon spending. The initiative began with an international push to help the environment. The invasive nature of its access to people's funds, and the restrictions it poses, violate personal autonomy(Since AI has access to personal finances and has the ability to restrict you from buying stuff raises concerns about violating the personal right to autonomy). CARE — Carbon Allowance Regulation for Emissions, was ratified in Ireland 'for the greater good', fully restricting personal spending in the EU. Now, AI will routinely stop purchases of carbon-emissive products such as petrol, if you have already reached your daily carbon quota. People are also limited in air travel. 
-
+        In 2060, EU law requires banks to have an AI agent that restricts people's carbon spending. The initiative began with an international push to help the environment. The invasive nature of its access to people's funds, and the restrictions it poses, violate personal autonomy (since AI has access to personal finances and has the ability to restrict you from buying stuff, raising concerns about violating the personal right to autonomy). CARE — Carbon Allowance Regulation for Emissions, was ratified in Ireland 'for the greater good', fully restricting personal spending in the EU. Now, AI will routinely stop purchases of carbon-emissive products such as petrol, if you have already reached your daily carbon quota. People are also limited in air travel.
       </p>
 
       <form id="valuesSurveyForm">
         <div class="plots">
           <div class="plot-card">
             <h3>Present Day</h3>
-            <svg id="presentPlot" class="ternary-svg" viewBox="0 0 600 430" aria-label="Present day ternary plot"></svg>
+            <!-- Tightened viewBox (35 15 530 395) removes wasted side margins on mobile -->
+            <svg id="presentPlot" class="ternary-svg" viewBox="35 15 530 395" aria-label="Present day ternary plot"></svg>
             <div class="values">
               <div class="value-box">Personal autonomy<strong id="presentAutonomy">33%</strong></div>
               <div class="value-box">Care for environment<strong id="presentEnvironment">34%</strong></div>
               <div class="value-box">Economic prosperity<strong id="presentProsperity">33%</strong></div>
             </div>
-            <p class="instruction">Click or drag the point.</p>
+            <p class="instruction">Tap or drag the point.</p>
           </div>
 
           <div class="plot-card">
             <h3>2060</h3>
-            <svg id="futurePlot" class="ternary-svg" viewBox="0 0 600 430" aria-label="2060 ternary plot"></svg>
+            <svg id="futurePlot" class="ternary-svg" viewBox="35 15 530 395" aria-label="2060 ternary plot"></svg>
             <div class="values">
               <div class="value-box">Personal autonomy<strong id="futureAutonomy">33%</strong></div>
               <div class="value-box">Care for environment<strong id="futureEnvironment">34%</strong></div>
               <div class="value-box">Economic prosperity<strong id="futureProsperity">33%</strong></div>
             </div>
-            <p class="instruction">Click or drag the point.</p>
+            <p class="instruction">Tap or drag the point.</p>
           </div>
         </div>
 
@@ -275,11 +314,7 @@
       </form>
     </div>
 
-
-
-
     <script>
-      // Firebase setup copied from the supplied survey, with a new database path for this survey.
       const firebaseSettings = {
         databaseURL: "https://digital-society-22690-default-rtdb.europe-west1.firebasedatabase.app/"
       };
@@ -473,19 +508,51 @@
         });
 
         const point = valuesToPoint(selections[selectionKey]);
+
+        // Invisible larger hit area for touch screens
+        const hitArea = svgEl("circle", {
+          cx: point.x,
+          cy: point.y,
+          r: 28,
+          class: "selection-hit-area"
+        });
+
         const pointElement = svgEl("circle", {
           cx: point.x,
           cy: point.y,
           r: 12,
           class: "selection-point"
         });
-        pointElement.addEventListener("pointerdown", event => beginDrag(event, svg, selectionKey));
+
+        svg.appendChild(hitArea);
         svg.appendChild(pointElement);
 
-        svg.addEventListener("pointerdown", event => {
-          if (event.target === pointElement) return;
-          updateFromPointer(event, svg, selectionKey);
-        });
+        // Unified pointer handler: tapping or dragging anywhere on the SVG smoothly moves the point
+        svg.onpointerdown = event => {
+          event.preventDefault();
+          pointElement.classList.add("dragging");
+          svg.setPointerCapture(event.pointerId);
+
+          updateFromPointer(event, svg, selectionKey, pointElement, hitArea, labelIds);
+
+          const move = moveEvent => {
+            updateFromPointer(moveEvent, svg, selectionKey, pointElement, hitArea, labelIds);
+          };
+
+          const end = endEvent => {
+            pointElement.classList.remove("dragging");
+            try {
+              svg.releasePointerCapture(endEvent.pointerId);
+            } catch (_) {}
+            svg.removeEventListener("pointermove", move);
+            svg.removeEventListener("pointerup", end);
+            svg.removeEventListener("pointercancel", end);
+          };
+
+          svg.addEventListener("pointermove", move);
+          svg.addEventListener("pointerup", end);
+          svg.addEventListener("pointercancel", end);
+        };
 
         updateValueLabels(selectionKey, labelIds);
       }
@@ -504,48 +571,17 @@
         return point.matrixTransform(svg.getScreenCTM().inverse());
       }
 
-      function updateFromPointer(event, svg, selectionKey, pointElement = null) {
+      function updateFromPointer(event, svg, selectionKey, pointElement, hitArea, labelIds) {
         const point = eventToSvgPoint(event, svg);
         selections[selectionKey] = pointToValues(point.x, point.y);
 
-        const outputIds = selectionKey === "presentDay"
-          ? { autonomy: "presentAutonomy", environment: "presentEnvironment", prosperity: "presentProsperity" }
-          : { autonomy: "futureAutonomy", environment: "futureEnvironment", prosperity: "futureProsperity" };
+        const newPoint = valuesToPoint(selections[selectionKey]);
+        pointElement.setAttribute("cx", newPoint.x);
+        pointElement.setAttribute("cy", newPoint.y);
+        hitArea.setAttribute("cx", newPoint.x);
+        hitArea.setAttribute("cy", newPoint.y);
 
-        if (pointElement) {
-          const newPoint = valuesToPoint(selections[selectionKey]);
-          pointElement.setAttribute("cx", newPoint.x);
-          pointElement.setAttribute("cy", newPoint.y);
-          updateValueLabels(selectionKey, outputIds);
-        } else {
-          renderPlot(selectionKey === "presentDay" ? "presentPlot" : "futurePlot", selectionKey, outputIds);
-        }
-      }
-
-      function beginDrag(event, svg, selectionKey) {
-        event.preventDefault();
-        event.stopPropagation();
-        const point = svg.querySelector(".selection-point");
-        point.classList.add("dragging");
-        point.setPointerCapture(event.pointerId);
-
-        const move = moveEvent => {
-          updateFromPointer(moveEvent, svg, selectionKey, point);
-        };
-
-        const end = endEvent => {
-          point.classList.remove("dragging");
-          try {
-            point.releasePointerCapture(endEvent.pointerId);
-          } catch (_) {}
-          point.removeEventListener("pointermove", move);
-          point.removeEventListener("pointerup", end);
-          point.removeEventListener("pointercancel", end);
-        };
-
-        point.addEventListener("pointermove", move);
-        point.addEventListener("pointerup", end);
-        point.addEventListener("pointercancel", end);
+        updateValueLabels(selectionKey, labelIds);
       }
 
       function renderAllPlots() {
